@@ -1,0 +1,17 @@
+#code for variables
+
+import netCDF4
+
+file2read = netCDF4.Dataset(ifiles[0], 'r')
+
+for var_name in file2read.variables:
+    var = file2read.variables[var_name]
+    print(f"Variable Name: {var_name}")
+    print(f"  Full Name: {getattr(var, 'Full_Name', 'No Full Name')}")
+    print(f"  Dimensions: {var.dimensions}")
+    print(f"  Shape: {var.shape}")
+    print(f"  Units: {getattr(var, 'Units', 'No Units')}")
+    print(f"  Description: {getattr(var, 'description', 'No Description')}")
+    print("-" * 40)  
+
+file2read.close() 
