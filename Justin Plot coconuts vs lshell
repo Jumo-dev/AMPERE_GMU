@@ -1,0 +1,36 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import netCDF4
+import glob
+import os
+
+# Load .nc files
+ifiles = glob.glob(os.path.expanduser("~/Desktop/POES DATA/*.nc"))
+
+plt.figure()
+
+# Only plot each energy bin label once
+plotted_labels = [False] * 4
+
+for itime in range(min(4, len(ifiles))):
+    file2read = netCDF4.Dataset(ifiles[itime], 'r')
+
+    lshell = np.array(file2read.variables['lValue'])
+    EOcounts_corrected = np.array(file2read.variables['EOcounts_corrected'])
+
+    # Filter for L-shell > 5
+    lshell_index = np.where(lshell > 5)[0]
+    lshell_filtered = lshell[lshell_index]
+
+    for i in range(4):  # E1–E4
+        counts_filtered = EOcounts_corrected[lshell_index, i]
+        label = f"E{i+1}" if not plotted_labels[i] else None
+        plt.scatter(lshell_filtered, counts_filtered, s=2, label=label)
+        plotted_labels[i] = True
+
+# Axis labels
+plt.title('EOcounts_corrected vs. Lshell')
+plt.xlabel('L-shell')
+plt.ylabel('Corrected EO Counts (counts/sec)')
+plt.legend()
+plt.show()
