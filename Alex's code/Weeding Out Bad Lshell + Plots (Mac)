@@ -24,7 +24,7 @@ for itime in range(0, 4):
     EOcounts_corrected = np.array(var)
     var = file2read.variables['Eerror']
     Eerror = np.array(var)
-    # var = file2read.variables[]
+
     
     
     lshell_index = np.where(lshell>5)
@@ -39,7 +39,6 @@ plt.scatter(lshell_index,new_EOcounts_array[0,:,3],s=2,label = "E4 - $90°$")
 
 plt.title('EOcounts vs Lshell (Corrected) ')
 plt.minorticks_on()
-tck.AutoMinorLocator()
 plt.grid(which='major',linestyle='-',alpha=0.8)   # add a grid to the major ticks
 plt.grid(which='minor',linestyle='--',alpha=0.5)
 plt.xlabel('LShell')
