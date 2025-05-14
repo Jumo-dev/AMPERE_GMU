@@ -1,0 +1,45 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import netCDF4
+import glob
+import os
+
+path = os.path.expanduser("~/Desktop/MEPED POES DATA")
+
+ifiles_00 = sorted(glob.glob(os.path.join(path, "POES_combinedSpectrum_n19_00_*.nc")))
+ifiles_90 = sorted(glob.glob(os.path.join(path, "POES_combinedSpectrum_n19_90_*.nc")))
+
+for i, (f0, f9) in enumerate(zip(ifiles_00, ifiles_90), start=1):
+    with netCDF4.Dataset(f0) as d0, netCDF4.Dataset(f9) as d9:
+        L = d0.variables['lValue'][:]
+        c0 = d0.variables['EOcounts_corrected'][:, 0]
+        c9 = d9.variables['EOcounts_corrected'][:, 0]
+        rtime = d0.variables['rtime'][:]  # assuming rtime exists
+
+    idx = L > 5
+    if not np.any(idx):
+        print(f"File {i}: No L > 5")
+        continue
+
+    x0, x9 = c0[idx], c9[idx]
+    rtime = rtime[idx]
+    flag = np.zeros(len(rtime))
+
+    for itime in range(len(rtime)):
+        if x0[itime] > x9[itime]:
+            flag[itime] = 1
+
+    print(f"File {i}: {np.sum(flag == 1)} times 00° > 90° (L > 5)")
+    print("Flag array:")
+    print(flag)
+    print("Corresponding times:")
+    print(rtime)
+
+    plt.scatter(rtime, x0, label="00°")
+    plt.scatter(rtime, x9, label="90°")
+    plt.title(f"EOcounts (L > 5) - File {i}")
+    plt.xlabel("Relative Time")
+    plt.ylabel("EOcounts_corrected")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
